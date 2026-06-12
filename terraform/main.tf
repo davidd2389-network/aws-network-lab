@@ -1,4 +1,11 @@
 # ---------------------------------------------------------------------------
+# NOTE: NAT Gateway and its EIP are commented out for the initial apply to
+# avoid hourly charges during early testing. Private subnet has no internet
+# route until these are re-enabled in Phase 2 (needed for Ansible to reach
+# package repositories from the app server).
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 # Provider
 # Tells Terraform we're targeting AWS and which region to use
 # ---------------------------------------------------------------------------
@@ -121,15 +128,15 @@ resource "aws_internet_gateway" "hub" {
 # NAT gateway needs a static public IP — this reserves one
 # ---------------------------------------------------------------------------
 
-resource "aws_eip" "nat" {
-  domain = "vpc"  # Required for VPC-scoped EIPs in modern AWS provider versions
+# resource "aws_eip" "nat" {
+#   domain = "vpc"  # Required for VPC-scoped EIPs in modern AWS provider versions
 
-  tags = {
-    Name        = "${var.project_name}-nat-eip"
-    Environment = var.environment
-    Project     = var.project_name
-  }
-}
+#   tags = {
+#     Name        = "${var.project_name}-nat-eip"
+#     Environment = var.environment
+#     Project     = var.project_name
+#   }
+# }
 
 # ---------------------------------------------------------------------------
 # NAT Gateway
@@ -138,21 +145,21 @@ resource "aws_eip" "nat" {
 # This is why the NAT goes in the public subnet, not the private one
 # ---------------------------------------------------------------------------
 
-resource "aws_nat_gateway" "hub" {
-  allocation_id = aws_eip.nat.id          # The EIP we just reserved
-  subnet_id     = aws_subnet.hub_public.id  # Must be in the PUBLIC subnet
+# resource "aws_nat_gateway" "hub" {
+#   allocation_id = aws_eip.nat.id          # The EIP we just reserved
+#   subnet_id     = aws_subnet.hub_public.id  # Must be in the PUBLIC subnet
 
-  tags = {
-    Name        = "${var.project_name}-nat-gw"
-    Environment = var.environment
-    Project     = var.project_name
-  }
+#   tags = {
+#     Name        = "${var.project_name}-nat-gw"
+#     Environment = var.environment
+#     Project     = var.project_name
+#   }
 
-  depends_on = [aws_internet_gateway.hub]
-  # depends_on tells Terraform to wait for the IGW to exist before creating
-  # the NAT gateway — even though there's no direct reference between them,
-  # the IGW must be attached for internet routing to work
-}
+#   depends_on = [aws_internet_gateway.hub]
+#   # depends_on tells Terraform to wait for the IGW to exist before creating
+#   # the NAT gateway — even though there's no direct reference between them,
+#   # the IGW must be attached for internet routing to work
+# }
 
 # ---------------------------------------------------------------------------
 # Route Tables
@@ -162,10 +169,10 @@ resource "aws_nat_gateway" "hub" {
 resource "aws_route_table" "hub_public" {
   vpc_id = aws_vpc.hub.id
 
-  route {
-    cidr_block = "0.0.0.0/0"                    # All internet traffic
-    gateway_id = aws_internet_gateway.hub.id     # Goes out through the IGW
-  }
+  # route {
+  #   cidr_block = "0.0.0.0/0"                    # All internet traffic
+  #   gateway_id = aws_internet_gateway.hub.id     # Goes out through the IGW
+  # }
 
   tags = {
     Name        = "${var.project_name}-hub-public-rt"
