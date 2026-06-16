@@ -185,10 +185,10 @@ resource "aws_route_table" "hub_public" {
 resource "aws_route_table" "hub_private" {
   vpc_id = aws_vpc.hub.id
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.hub.id  # Goes out through NAT, not IGW directly
-  }
+  # route {
+  #   cidr_block     = "0.0.0.0/0"
+  #   nat_gateway_id = aws_nat_gateway.hub.id  # Goes out through NAT, not IGW directly
+  # }
 
   tags = {
     Name        = "${var.project_name}-hub-private-rt"

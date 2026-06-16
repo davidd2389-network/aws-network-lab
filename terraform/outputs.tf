@@ -52,7 +52,7 @@ output "peering_connection_id" {
 # private subnet traffic will appear to come from when reaching the internet
 # ---------------------------------------------------------------------------
 
-output "nat_gateway_public_ip" {
-  description = "Public IP address of the NAT gateway"
-  value       = aws_eip.nat.public_ip
-}
+# output "nat_gateway_public_ip" {
+#   description = "Public IP address of the NAT gateway"
+#   value       = aws_eip.nat.public_ip
+# }
